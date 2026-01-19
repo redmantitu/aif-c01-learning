@@ -1,0 +1,1646 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS AI Practitioner (AIF-C01) Deep Dive Master</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .gradient-header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+
+        .aws-orange {
+            color: #ff9900;
+        }
+
+        .bg-aws-orange {
+            background-color: #ff9900;
+        }
+
+        .border-aws-orange {
+            border-color: #ff9900;
+        }
+
+        .tab-btn {
+            border-bottom: 3px solid transparent;
+            color: #64748b;
+        }
+
+        .tab-active {
+            border-bottom: 3px solid #ff9900;
+            color: #0f172a;
+            font-weight: 700;
+            background-color: #f1f5f9;
+        }
+
+        /* Flashcard 3D Flip */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+
+        .transform-style-3d {
+            transform-style: preserve-3d;
+        }
+
+        .backface-hidden {
+            backface-visibility: hidden;
+        }
+
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .exam-tip {
+            border-left: 4px solid #ff9900;
+            background-color: #fff7ed;
+        }
+    </style>
+</head>
+
+<body class="h-screen flex flex-col overflow-hidden text-slate-800">
+
+    <!-- Header -->
+    <header class="gradient-header text-white p-4 shadow-lg shrink-0 z-20">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm">
+                    <i class="fas fa-brain text-2xl aws-orange"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight">AWS Certified AI Practitioner</h1>
+                    <p class="text-xs text-slate-300 font-medium">AIF-C01 Deep Dive | Based on Slides v16</p>
+                </div>
+            </div>
+            <div class="hidden lg:flex space-x-6 text-sm font-medium"> <!-- Adjusted spacing -->
+                <div class="text-center opacity-90 hover:opacity-100 transition">
+                    <span class="block text-aws-orange font-bold">Domain 1 (20%)</span>
+                    <span class="text-xs">Fundamentals</span>
+                </div>
+                <div class="text-center opacity-90 hover:opacity-100 transition">
+                    <span class="block text-aws-orange font-bold">Domain 2 (24%)</span>
+                    <span class="text-xs">GenAI & Bedrock</span>
+                </div>
+                <div class="text-center opacity-90 hover:opacity-100 transition">
+                    <span class="block text-aws-orange font-bold">Domain 3 (28%)</span>
+                    <span class="text-xs">Applications</span>
+                </div>
+                <div class="text-center opacity-90 hover:opacity-100 transition">
+                    <span class="block text-aws-orange font-bold">Domain 4 (14%)</span>
+                    <span class="text-xs">Responsible AI</span>
+                </div>
+                <div class="text-center opacity-90 hover:opacity-100 transition">
+                    <span class="block text-aws-orange font-bold">Domain 5 (14%)</span>
+                    <span class="text-xs">Security & Gov</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="bg-white border-b shadow-sm shrink-0 z-10">
+        <div class="container mx-auto flex">
+            <button onclick="switchTab('study')" id="tab-study"
+                class="flex-1 py-4 text-center tab-btn tab-active hover:bg-gray-50 transition flex items-center justify-center gap-2 font-medium">
+                <i class="fas fa-book-open"></i> Study Guide (Deep Dive)
+            </button>
+            <button onclick="switchTab('flashcards')" id="tab-flashcards"
+                class="flex-1 py-4 text-center tab-btn hover:bg-gray-50 transition flex items-center justify-center gap-2 font-medium">
+                <i class="fas fa-layer-group"></i> Flashcards (50+)
+            </button>
+            <button onclick="switchTab('quiz')" id="tab-quiz"
+                class="flex-1 py-4 text-center tab-btn hover:bg-gray-50 transition flex items-center justify-center gap-2 font-medium">
+                <i class="fas fa-check-circle"></i> Exam Simulator
+            </button>
+        </div>
+    </nav>
+
+    <main class="flex-1 overflow-y-auto bg-slate-50 relative scroll-smooth" id="main-container">
+        <div id="view-study" class="container mx-auto p-4 space-y-6 fade-in pb-20">
+            <!-- NEW: 4-Step Study Roadmap -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div onclick="scrollToSection('d1')"
+                    class="bg-white p-4 rounded-xl shadow-sm border-t-4 border-blue-500 text-center cursor-pointer hover:shadow-md hover:-translate-y-1 transition-all group">
+                    <div class="text-2xl font-bold text-blue-500 mb-1 group-hover:scale-110 transition-transform">1
+                    </div>
+                    <div class="text-xs font-bold uppercase text-slate-400">Concepts</div>
+                    <p class="text-xs mt-2 text-slate-600">Learn D1 & D2 Fundamentals first.</p>
+                </div>
+                <div onclick="scrollToSection('d3')"
+                    class="bg-white p-4 rounded-xl shadow-sm border-t-4 border-indigo-500 text-center cursor-pointer hover:shadow-md hover:-translate-y-1 transition-all group">
+                    <div class="text-2xl font-bold text-indigo-500 mb-1 group-hover:scale-110 transition-transform">2
+                    </div>
+                    <div class="text-xs font-bold uppercase text-slate-400">AWS Services</div>
+                    <p class="text-xs mt-2 text-slate-600">Match tasks to services in D3.</p>
+                </div>
+                <div onclick="scrollToSection('d4')"
+                    class="bg-white p-4 rounded-xl shadow-sm border-t-4 border-purple-500 text-center cursor-pointer hover:shadow-md hover:-translate-y-1 transition-all group">
+                    <div class="text-2xl font-bold text-purple-500 mb-1 group-hover:scale-110 transition-transform">3
+                    </div>
+                    <div class="text-xs font-bold uppercase text-slate-400">Rules</div>
+                    <p class="text-xs mt-2 text-slate-600">Master D4 Ethics & D5 Security.</p>
+                </div>
+                <div onclick="switchTab('quiz')"
+                    class="bg-white p-4 rounded-xl shadow-sm border-t-4 border-aws-orange text-center cursor-pointer hover:shadow-md hover:-translate-y-1 transition-all group">
+                    <div class="text-2xl font-bold text-aws-orange mb-1 group-hover:scale-110 transition-transform">4
+                    </div>
+                    <div class="text-xs font-bold uppercase text-slate-400">Simulator</div>
+                    <p class="text-xs mt-2 text-slate-600">Take the quiz until you hit 90%.</p>
+                </div>
+            </div>
+
+            <!-- Exam Strategy Box -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                <h3 class="font-bold text-slate-800 text-lg mb-4 flex items-center">
+                    <i class="fas fa-crosshairs text-blue-600 mr-2"></i> Exam Strategy & Weighting
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-3"> <!-- Changed to 5 cols -->
+                    <div class="bg-blue-50 p-3 rounded-lg border border-blue-100">
+                        <div class="text-xl font-bold text-blue-700">20%</div>
+                        <div class="text-xs font-semibold text-blue-900">D1: Fundamentals</div>
+                    </div>
+                    <div class="bg-indigo-50 p-3 rounded-lg border border-indigo-100">
+                        <div class="text-xl font-bold text-indigo-700">24%</div>
+                        <div class="text-xs font-semibold text-indigo-900">D2: GenAI</div>
+                    </div>
+                    <div class="bg-purple-50 p-3 rounded-lg border border-purple-100">
+                        <div class="text-xl font-bold text-purple-700">28%</div>
+                        <div class="text-xs font-semibold text-purple-900">D3: Applications</div>
+                    </div>
+                    <div class="bg-teal-50 p-3 rounded-lg border border-teal-100">
+                        <div class="text-xl font-bold text-teal-700">14%</div>
+                        <div class="text-xs font-semibold text-teal-900">D4: Ethics</div>
+                    </div>
+                    <div class="bg-red-50 p-3 rounded-lg border border-red-100">
+                        <div class="text-xl font-bold text-red-700">14%</div>
+                        <div class="text-xs font-semibold text-red-900">D5: Security</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Domain 1 Section -->
+            <section id="section-d1" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-5 bg-slate-800 text-white flex justify-between items-center cursor-pointer hover:bg-slate-700 transition"
+                    onclick="toggleSection('d1')">
+                    <h2 class="text-lg font-bold flex items-center gap-3">
+                        <span class="bg-aws-orange text-black px-2 py-0.5 rounded text-xs">DOMAIN 1</span>
+                        Fundamentals of AI & ML (Cheat Sheet included)
+                    </h2>
+                    <i class="fas fa-chevron-down transform transition-transform" id="icon-d1"></i>
+                </div>
+                <div id="content-d1" class="hidden p-6 space-y-8 border-t border-slate-100">
+
+                    <!-- NEW: Exam Trigger Cheat Sheet -->
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-5 mb-8">
+                        <h3 class="font-bold text-yellow-800 mb-3 flex items-center"><i class="fas fa-bolt mr-2"></i>
+                            Exam Trigger Cheat Sheet (Memorize!)</h3>
+                        <div class="grid md:grid-cols-2 gap-4 text-sm">
+                            <div class="bg-white p-2 rounded shadow-sm border-l-4 border-blue-500">
+                                <span class="block font-bold text-slate-700">Predict Number? (Price, Temp)</span>
+                                <span class="text-blue-600 font-mono">Regression (Supervised)</span>
+                            </div>
+                            <div class="bg-white p-2 rounded shadow-sm border-l-4 border-blue-500">
+                                <span class="block font-bold text-slate-700">Predict Category? (Spam, Fraud)</span>
+                                <span class="text-blue-600 font-mono">Classification (Supervised)</span>
+                            </div>
+                            <div class="bg-white p-2 rounded shadow-sm border-l-4 border-purple-500">
+                                <span class="block font-bold text-slate-700">Group Data? (Customer Segments)</span>
+                                <span class="text-purple-600 font-mono">Clustering (Unsupervised)</span>
+                            </div>
+                            <div class="bg-white p-2 rounded shadow-sm border-l-4 border-red-500">
+                                <span class="block font-bold text-slate-700">Learn by Trial/Error? (Robot)</span>
+                                <span class="text-red-600 font-mono">Reinforcement Learning</span>
+                            </div>
+                            <div class="bg-white p-2 rounded shadow-sm border-l-4 border-green-500">
+                                <span class="block font-bold text-slate-700">Minimize False Negatives? (Cancer)</span>
+                                <span class="text-green-600 font-mono">Maximize RECALL</span>
+                            </div>
+                            <div class="bg-white p-2 rounded shadow-sm border-l-4 border-green-500">
+                                <span class="block font-bold text-slate-700">Minimize False Positives? (Spam)</span>
+                                <span class="text-green-600 font-mono">Maximize PRECISION</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- New Section: AI Hierarchy -->
+                    <div class="bg-indigo-50 p-4 rounded-lg border border-indigo-100 mb-6">
+                        <h3 class="font-bold text-indigo-800 mb-2">AI vs ML vs Deep Learning vs GenAI</h3>
+                        <div class="flex flex-col md:flex-row gap-4 items-center">
+                            <div class="flex-1 text-sm text-indigo-900">
+                                <ul class="space-y-2">
+                                    <li><strong class="bg-indigo-200 px-1 rounded">Artificial Intelligence
+                                            (AI):</strong> Any technique that enables computers to mimic human
+                                        intelligence.</li>
+                                    <li><strong class="bg-indigo-200 px-1 rounded">Machine Learning (ML):</strong>
+                                        Subset of AI. Machines "learn" from data without being explicitly programmed.
+                                    </li>
+                                    <li><strong class="bg-indigo-200 px-1 rounded">Deep Learning (DL):</strong> Subset
+                                        of ML. Uses Neural Networks with many layers (like the human brain).</li>
+                                    <li><strong class="bg-indigo-200 px-1 rounded">Generative AI (GenAI):</strong>
+                                        Subset of DL. Creates <em>new</em> content (Text, Images, Code) rather than just
+                                        classifying existing data.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Learning Paradigms -->
+                    <div class="grid md:grid-cols-3 gap-4 mb-8">
+                        <div class="bg-green-50 p-3 rounded border border-green-100">
+                            <strong class="block text-green-800 mb-1">Supervised Learning</strong>
+                            <p class="text-xs text-slate-600"><strong>Labeled Data.</strong> You know the
+                                answer.<br><em>Ex: Forecasting sales (Regression), Spam detection (Classification).</em>
+                            </p>
+                        </div>
+                        <div class="bg-yellow-50 p-3 rounded border border-yellow-100">
+                            <strong class="block text-yellow-800 mb-1">Unsupervised Learning</strong>
+                            <p class="text-xs text-slate-600"><strong>Unlabeled Data.</strong> Finding hidden
+                                patterns.<br><em>Ex: Customer Segmentation (Clustering), Anomaly Detection.</em></p>
+                        </div>
+                        <div class="bg-red-50 p-3 rounded border border-red-100">
+                            <strong class="block text-red-800 mb-1">Reinforcement Learning</strong>
+                            <p class="text-xs text-slate-600"><strong>Rewards & Penalties.</strong> Trial and
+                                error.<br><em>Ex: Robotics, Gaming, Self-driving cars.</em></p>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="font-bold text-blue-700 mb-3 border-b pb-2">1. The ML Lifecycle (Key Process)
+                            </h3>
+                            <div class="space-y-2 text-sm">
+                                <p class="exam-tip p-3 rounded text-sm mb-4"><strong>Exam Tip:</strong> Memorize the
+                                    order of these steps.</p>
+                                <ol class="list-decimal pl-5 space-y-2 text-slate-700">
+                                    <li><strong>Business Goal:</strong> Define the problem.</li>
+                                    <li><strong>Data Preparation:</strong> Collection, Cleaning, Labeling, Feature
+                                        Engineering.</li>
+                                    <li><strong>Model Training:</strong> Selecting algorithm, splitting data
+                                        (Train/Test/Validate).</li>
+                                    <li><strong>Model Evaluation:</strong> Testing against unseen data (Metrics).</li>
+                                    <li><strong>Deployment:</strong> Endpoint creation (Real-time vs Batch).</li>
+                                    <li><strong>Monitoring:</strong> Drift detection (Data Drift, Model Drift).</li>
+                                </ol>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="font-bold text-blue-700 mb-3 border-b pb-2">2. Evaluation Metrics Deep Dive</h3>
+                            <div class="space-y-3 text-sm">
+                                <table class="w-full text-left border-collapse">
+                                    <tr class="border-b">
+                                        <th class="py-1">Metric</th>
+                                        <th class="py-1">Use Case</th>
+                                    </tr>
+                                    <tr class="border-b">
+                                        <td class="py-2 font-semibold text-indigo-700">Recall / Sensitivity</td>
+                                        <td class="py-2 text-slate-600">Minimize False Negatives. <br><em>Ex: Cancer
+                                                diagnosis, Fraud detection (Catch ALL cases).</em></td>
+                                    </tr>
+                                    <tr class="border-b">
+                                        <td class="py-2 font-semibold text-indigo-700">Precision</td>
+                                        <td class="py-2 text-slate-600">Minimize False Positives. <br><em>Ex: Spam
+                                                filter (Don't delete real mail).</em></td>
+                                    </tr>
+                                    <tr class="border-b">
+                                        <td class="py-2 font-semibold text-indigo-700">F1 Score</td>
+                                        <td class="py-2 text-slate-600">Harmonic mean. Use when data is
+                                            <strong>Imbalanced</strong>.
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-2 font-semibold text-indigo-700">ROUGE / BLEU / BERTScore</td>
+                                        <td class="py-2 text-slate-600"><strong>GenAI Specific:</strong> Evaluating text
+                                            summarization & translation quality.</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 p-4 rounded border border-slate-200">
+                        <h3 class="font-bold text-slate-800 mb-2">Generative AI Value Chain</h3>
+                        <div class="grid md:grid-cols-3 gap-4 text-sm text-center">
+                            <div class="bg-white p-3 rounded shadow-sm">
+                                <strong class="block text-indigo-600">Infrastructure</strong>
+                                AWS (EC2 Trn1, Inf2, UltraClusters)
+                            </div>
+                            <div class="bg-white p-3 rounded shadow-sm">
+                                <strong class="block text-indigo-600">Model Providers</strong>
+                                Anthropic, Cohere, AI21, Meta, Mistral, Amazon (Titan)
+                            </div>
+                            <div class="bg-white p-3 rounded shadow-sm">
+                                <strong class="block text-indigo-600">Applications</strong>
+                                Q, Bedrock Apps, Custom Apps
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Domain 2 Section -->
+            <section class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-5 bg-slate-800 text-white flex justify-between items-center cursor-pointer hover:bg-slate-700 transition"
+                    onclick="toggleSection('d2')">
+                    <h2 class="text-lg font-bold flex items-center gap-3">
+                        <span class="bg-aws-orange text-black px-2 py-0.5 rounded text-xs">DOMAIN 2</span>
+                        Generative AI & Amazon Bedrock
+                    </h2>
+                    <i class="fas fa-chevron-down transform transition-transform" id="icon-d2"></i>
+                </div>
+                <div id="content-d2" class="hidden p-6 space-y-8 border-t border-slate-100">
+
+                    <!-- Foundation Model Lifecycle -->
+                    <div class="border-b border-slate-200 pb-6">
+                        <h3 class="font-bold text-slate-800 mb-4">The Foundation Model Lifecycle (Exam Critical)</h3>
+                        <div class="flex flex-col md:flex-row items-center justify-between text-center gap-2 text-xs">
+                            <div class="flex-1 bg-slate-50 p-2 rounded">
+                                <span class="font-bold block text-blue-600">1. Pre-training</span>
+                                <span class="text-slate-500">Massive unlabeled data. Expensive. Learn patterns.</span>
+                            </div>
+                            <i class="fas fa-arrow-right text-slate-300 transform rotate-90 md:rotate-0"></i>
+                            <div class="flex-1 bg-slate-50 p-2 rounded">
+                                <span class="font-bold block text-blue-600">2. Adaptation</span>
+                                <span class="text-slate-500">Fine-tuning / RAG to add domain knowledge.</span>
+                            </div>
+                            <i class="fas fa-arrow-right text-slate-300 transform rotate-90 md:rotate-0"></i>
+                            <div class="flex-1 bg-slate-50 p-2 rounded">
+                                <span class="font-bold block text-blue-600">3. Evaluation</span>
+                                <span class="text-slate-500">Human vs Automated (ROUGE/BLEU) assessment.</span>
+                            </div>
+                            <i class="fas fa-arrow-right text-slate-300 transform rotate-90 md:rotate-0"></i>
+                            <div class="flex-1 bg-slate-50 p-2 rounded">
+                                <span class="font-bold block text-blue-600">4. Deployment</span>
+                                <span class="text-slate-500">Optimization (Quantization) & Hosting.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Inference Parameters -->
+                    <div class="bg-orange-50 rounded-lg p-6 border border-orange-200">
+                        <h3 class="text-lg font-bold text-orange-900 mb-4">Controlling the Output (Inference Parameters)
+                        </h3>
+                        <div class="grid md:grid-cols-4 gap-4 text-sm">
+                            <div class="bg-white p-3 rounded shadow-sm">
+                                <div class="font-bold text-slate-800 mb-1">Temperature</div>
+                                <p class="text-xs">0 = Deterministic (Math/Code).<br>1 = Creative (Poetry).</p>
+                            </div>
+                            <div class="bg-white p-3 rounded shadow-sm">
+                                <div class="font-bold text-slate-800 mb-1">Top-P (Nucleus)</div>
+                                <p class="text-xs">Limits choices to cumulative probability P (e.g., top 90%). Cuts long
+                                    tail.</p>
+                            </div>
+                            <div class="bg-white p-3 rounded shadow-sm">
+                                <div class="font-bold text-slate-800 mb-1">Top-K</div>
+                                <p class="text-xs">Hard limit. Choose from top K tokens only (e.g., top 50).</p>
+                            </div>
+                            <div class="bg-white p-3 rounded shadow-sm">
+                                <div class="font-bold text-slate-800 mb-1">Stop Sequences</div>
+                                <p class="text-xs">String that tells the model to stop generating.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bedrock Deep Dive -->
+                    <div>
+                        <h3 class="font-bold text-blue-700 mb-3">Bedrock Components (The Core of the Exam)</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+
+                            <!-- Knowledge Bases -->
+                            <div class="border p-4 rounded hover:bg-slate-50 transition">
+                                <strong class="text-lg text-purple-700 flex items-center gap-2"><i
+                                        class="fas fa-database"></i> Knowledge Bases (RAG)</strong>
+                                <p class="text-sm mt-2 mb-2 text-slate-600">Connects FM to your data sources. Workflow:
+                                </p>
+                                <ol class="list-decimal pl-5 text-xs text-slate-700 space-y-1">
+                                    <li>Data Source (S3)</li>
+                                    <li><strong>Chunking:</strong> Breaking text into small pieces.</li>
+                                    <li><strong>Embedding:</strong> Titan Embeddings model converts text to vectors.
+                                    </li>
+                                    <li><strong>Vector Database:</strong> Stores vectors (OpenSearch Serverless, Aurora,
+                                        Pinecone, Redis, Neptune).</li>
+                                    <li><strong>Retrieval:</strong> Finds relevant chunks for the query.</li>
+                                </ol>
+                            </div>
+
+                            <!-- Agents -->
+                            <div class="border p-4 rounded hover:bg-slate-50 transition">
+                                <strong class="text-lg text-purple-700 flex items-center gap-2"><i
+                                        class="fas fa-robot"></i>
+                                    Agents</strong>
+                                <p class="text-sm mt-2 mb-2 text-slate-600">Executes multi-step tasks.</p>
+                                <ul class="list-disc pl-5 text-xs text-slate-700 space-y-1">
+                                    <li><strong>Orchestration:</strong> Breaks down tasks (Reasoning).</li>
+                                    <li><strong>Action Groups:</strong> Defines APIs the agent can call (OpenAPI
+                                        schema).</li>
+                                    <li><strong>Lambda Functions:</strong> The actual code execution.</li>
+                                    <li><strong>Trace:</strong> Allows you to see the agent's "Chain of Thought"
+                                        reasoning.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bedrock Pricing -->
+                    <div class="bg-slate-100 p-4 rounded text-sm">
+                        <strong class="block mb-2">Bedrock Pricing Models</strong>
+                        <ul class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <li><span class="font-bold text-slate-700">On-Demand:</span> Pay-per-token (Input/Output).
+                                Good for fluctuating traffic.</li>
+                            <li><span class="font-bold text-slate-700">Provisioned Throughput:</span> Purchase "Model
+                                Units" for a term (1-6 months). Guaranteed performance. Required for fine-tuned models.
+                            </li>
+                            <li><span class="font-bold text-slate-700">Batch Inference:</span> Process large datasets
+                                offline (S3 bucket input/output). Cheaper, strictly non-real-time.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Domain 3 Section -->
+            <section id="section-d3" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-5 bg-slate-800 text-white flex justify-between items-center cursor-pointer hover:bg-slate-700 transition"
+                    onclick="toggleSection('d3')">
+                    <h2 class="text-lg font-bold flex items-center gap-3">
+                        <span class="bg-aws-orange text-black px-2 py-0.5 rounded text-xs">DOMAIN 3</span>
+                        Applications of Foundation Models
+                    </h2>
+                    <i class="fas fa-chevron-down transform transition-transform" id="icon-d3"></i>
+                </div>
+                <div id="content-d3" class="hidden p-6 space-y-8 border-t border-slate-100">
+
+                    <!-- NEW: Scenario Library -->
+                    <div class="bg-slate-100 p-5 rounded-lg border border-slate-200 mb-8">
+                        <h3 class="font-bold text-slate-800 mb-4">Scenario Library: "Which Service?"</h3>
+                        <div class="grid md:grid-cols-2 gap-4 text-sm">
+                            <div class="bg-white p-3 rounded border border-slate-200">
+                                <strong class="text-indigo-600 block mb-1">Text-to-Speech (Audio)</strong>
+                                <p class="text-slate-600">Want to read a blog post out loud? <br><strong>Answer: Amazon
+                                        Polly</strong></p>
+                            </div>
+                            <div class="bg-white p-3 rounded border border-slate-200">
+                                <strong class="text-indigo-600 block mb-1">Speech-to-Text (Transcription)</strong>
+                                <p class="text-slate-600">Want to capitalize customer service calls? <br><strong>Answer:
+                                        Amazon Transcribe</strong></p>
+                            </div>
+                            <div class="bg-white p-3 rounded border border-slate-200">
+                                <strong class="text-indigo-600 block mb-1">Translation & Localization</strong>
+                                <p class="text-slate-600">Real-time website translation? <br><strong>Answer: Amazon
+                                        Translate</strong></p>
+                            </div>
+                            <div class="bg-white p-3 rounded border border-slate-200">
+                                <strong class="text-indigo-600 block mb-1">Sentiment & PII Detection</strong>
+                                <p class="text-slate-600">Is the customer invalid? Redact emails? <br><strong>Answer:
+                                        Amazon Comprehend</strong></p>
+                            </div>
+                            <div class="bg-white p-3 rounded border border-slate-200">
+                                <strong class="text-indigo-600 block mb-1">Document/Form Extraction</strong>
+                                <p class="text-slate-600">Scanned PDFs, handwritten invoices, tables?
+                                    <br><strong>Answer: Amazon Textract</strong>
+                                </p>
+                            </div>
+                            <div class="bg-white p-3 rounded border border-slate-200">
+                                <strong class="text-indigo-600 block mb-1">Image/Video Analysis</strong>
+                                <p class="text-slate-600">Face detection, content moderation (nude/violence)?
+                                    <br><strong>Answer: Amazon Rekognition</strong>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RAG vs Fine-tuning -->
+                    <div class="grid md:grid-cols-2 gap-0 border border-slate-200 rounded-lg overflow-hidden">
+                        <div class="bg-blue-50 p-4 border-b md:border-b-0 md:border-r border-blue-100">
+                            <h3 class="font-bold text-blue-800 mb-2 center">RAG (Retrieval Augmented Generation)</h3>
+                            <ul class="text-sm space-y-2 list-disc pl-5 text-blue-900">
+                                <li><strong>Goal:</strong> Connect to <em>internal/new</em> data.</li>
+                                <li><strong>Pros:</strong> Cheaper, no training required, citations enabled, fewer
+                                    hallucinations.</li>
+                                <li><strong>Use Case:</strong> "Answer questions about our internal PDF policy docs."
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="bg-purple-50 p-4">
+                            <h3 class="font-bold text-purple-800 mb-2 center">Fine-Tuning</h3>
+                            <ul class="text-sm space-y-2 list-disc pl-5 text-purple-900">
+                                <li><strong>Goal:</strong> Change model <em>behavior/style</em>.</li>
+                                <li><strong>Pros:</strong> Teaches "industry speak" (Medical/Legal), specific
+                                    formatting.</li>
+                                <li><strong>Use Case:</strong> "Summarize medical reports in a very specific format."
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Confusion Buster Table -->
+                    <div class="overflow-hidden rounded-lg border border-slate-200">
+                        <h3 class="font-bold text-blue-700 mb-3 px-2">Service Confusion Buster (Common Exam Traps)</h3>
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-slate-100 text-slate-700">
+                                <tr>
+                                    <th class="p-3">Service A</th>
+                                    <th class="p-3">Service B</th>
+                                    <th class="p-3">Difference</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200">
+                                <tr class="bg-white">
+                                    <td class="p-3 font-medium">Amazon Kendra</td>
+                                    <td class="p-3 font-medium">Amazon OpenSearch</td>
+                                    <td class="p-3"><strong>Kendra</strong> is an out-of-the-box intelligent enterprise
+                                        search service (connectors included). <strong>OpenSearch</strong> is a
+                                        database/search engine you build upon (often used as Vector DB).</td>
+                                </tr>
+                                <tr class="bg-slate-50">
+                                    <td class="p-3 font-medium">Textract</td>
+                                    <td class="p-3 font-medium">Rekognition</td>
+                                    <td class="p-3"><strong>Textract</strong> is for Documents (OCR, Tables, Forms).
+                                        <strong>Rekognition</strong> is for Photos/Videos (Faces, Objects, Scenes).
+                                    </td>
+                                </tr>
+                                <tr class="bg-white">
+                                    <td class="p-3 font-medium">Q Business</td>
+                                    <td class="p-3 font-medium">Q Developer</td>
+                                    <td class="p-3"><strong>Q Business</strong> connects to enterprise data (Wiki, Docs)
+                                        for employees. <strong>Q Developer</strong> lives in the IDE for coding and AWS
+                                        Console for troubleshooting.</td>
+                                </tr>
+                                <tr class="bg-slate-50">
+                                    <td class="p-3 font-medium">SageMaker Canvas</td>
+                                    <td class="p-3 font-medium">SageMaker Studio</td>
+                                    <td class="p-3"><strong>Canvas</strong> is No-Code (Business Analyst).
+                                        <strong>Studio</strong> is an IDE for Data Scientists (Python/Jupyter).
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- SageMaker Components -->
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                        <h3 class="font-bold text-slate-800 mb-2">SageMaker Toolset (Memorize These)</h3>
+                        <ul class="grid md:grid-cols-2 gap-x-8 gap-y-2 text-sm list-disc pl-5">
+                            <li><strong>SageMaker Canvas:</strong> No-code interface for business analysts.</li>
+                            <li><strong>SageMaker Data Wrangler:</strong> Prepares/cleans data for ML (300+
+                                transformations).</li>
+                            <li><strong>SageMaker Autopilot:</strong> AutoML. Automatically builds/trains/tunes best
+                                model.</li>
+                            <li><strong>SageMaker Feature Store:</strong> Repository to store & share ML features.</li>
+                            <li><strong>SageMaker JumpStart:</strong> Model hub (deploy models with 1 click).</li>
+                            <li><strong>SageMaker Clarify:</strong> Bias detection & explainability (SHAP values).</li>
+                            <li><strong>SageMaker Ground Truth:</strong> Managed data labeling service
+                                (Human-in-the-loop).</li>
+                            <li><strong>SageMaker Model Cards:</strong> Documentation for governance.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            </section>
+
+            <!-- Domain 4 Section (Responsible AI Only) -->
+            <section id="section-d4" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-5 bg-slate-800 text-white flex justify-between items-center cursor-pointer hover:bg-slate-700 transition"
+                    onclick="toggleSection('d4')">
+                    <h2 class="text-lg font-bold flex items-center gap-3">
+                        <span class="bg-aws-orange text-black px-2 py-0.5 rounded text-xs">DOMAIN 4</span>
+                        Responsible AI (Principles)
+                    </h2>
+                    <i class="fas fa-chevron-down transform transition-transform" id="icon-d4"></i>
+                </div>
+                <div id="content-d4" class="hidden p-6 space-y-8 border-t border-slate-100">
+
+                    <div class="space-y-4">
+                        <h3 class="font-bold text-teal-700 border-b pb-2">The Pillars of Responsible AI</h3>
+                        <div class="grid md:grid-cols-2 gap-4 text-sm">
+                            <div class="bg-teal-50 p-3 rounded">
+                                <strong class="block text-teal-900">1. Fairness (Bias)</strong>
+                                <p>System should treat all groups of people equally. <br><span
+                                        class="text-xs italic text-teal-600">Tool: SageMaker Clarify</span></p>
+                            </div>
+                            <div class="bg-teal-50 p-3 rounded">
+                                <strong class="block text-teal-900">2. Explainability</strong>
+                                <p>Understanding HOW and WHY a model made a decision. <br><span
+                                        class="text-xs italic text-teal-600">Tool: SageMaker Clarify (SHAP) / Model
+                                        Cards</span></p>
+                            </div>
+                            <div class="bg-teal-50 p-3 rounded">
+                                <strong class="block text-teal-900">3. Privacy & Security</strong>
+                                <p>Data protection throughout the lifecycle. <br><span
+                                        class="text-xs italic text-teal-600">Tool: PrivateLink, KMS, Bedrock Data
+                                        Protocol</span></p>
+                            </div>
+                            <div class="bg-teal-50 p-3 rounded">
+                                <strong class="block text-teal-900">4. Robustness</strong>
+                                <p>System remains safe even under attack (Prompt injection) or erroneous input.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- NEW: PII & Macie -->
+                    <div class="bg-blue-50 p-4 rounded border border-blue-100">
+                        <h3 class="font-bold text-blue-700 mb-2">Deep Dive: PII Protection</h3>
+                        <p class="text-sm text-slate-700 mb-2"><strong>Scenario:</strong> You have a dataset in S3 with
+                            customer emails (PII). You need to clean it before training.</p>
+                        <div class="flex gap-4 text-xs">
+                            <div class="bg-white p-2 rounded shadow-sm flex-1">
+                                <strong class="block text-blue-800">1. Discovery</strong>
+                                Use <strong>Amazon Macie</strong> to scan S3 and <em>find</em> the PII.
+                            </div>
+                            <div class="bg-white p-2 rounded shadow-sm flex-1">
+                                <strong class="block text-blue-800">2. Redaction</strong>
+                                Use <strong>Amazon Comprehend</strong> or <strong>Glue DataBrew</strong> to mask/redact
+                                it.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-red-50 p-4 rounded border border-red-100">
+                        <h3 class="font-bold text-red-700 mb-2">Bias Deep Dive</h3>
+                        <ul class="text-sm space-y-2 list-disc pl-5">
+                            <li><strong>Pre-training Bias:</strong> Exists in the raw data (internet data).</li>
+                            <li><strong>Selection Bias:</strong> Training data doesn't represent the real world
+                                population.</li>
+                            <li><strong>Overfitting:</strong> Model memorizes noise instead of patterns.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Domain 5 Section (New) -->
+            <section id="section-d5" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-5 bg-slate-800 text-white flex justify-between items-center cursor-pointer hover:bg-slate-700 transition"
+                    onclick="toggleSection('d5')">
+                    <h2 class="text-lg font-bold flex items-center gap-3">
+                        <span class="bg-aws-orange text-black px-2 py-0.5 rounded text-xs">DOMAIN 5</span>
+                        Security, Compliance & Governance
+                    </h2>
+                    <i class="fas fa-chevron-down transform transition-transform" id="icon-d5"></i>
+                </div>
+                <div id="content-d5" class="hidden p-6 space-y-8 border-t border-slate-100">
+
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="font-bold text-red-700 mb-3 border-b pb-2">Security & Compliance Tools</h3>
+                            <ul class="space-y-3 text-sm">
+                                <li class="bg-slate-50 p-2 rounded">
+                                    <strong class="text-red-600">Amazon Macie</strong>
+                                    <p class="text-xs">Security service that uses ML to discover and protect sensitive
+                                        data (PII) in Amazon S3.</p>
+                                </li>
+                                <li class="bg-slate-50 p-2 rounded">
+                                    <strong class="text-red-600">AWS Config</strong>
+                                    <p class="text-xs">Audits configuration history. "Did the setting change?"
+                                        (Compliance)</p>
+                                </li>
+                                <li class="bg-slate-50 p-2 rounded">
+                                    <strong class="text-red-600">AWS CloudTrail</strong>
+                                    <p class="text-xs">Audits API activity. "Who called the API?" (Auditing)</p>
+                                </li>
+                                <li class="bg-slate-50 p-2 rounded">
+                                    <strong class="text-red-600">AWS KMS</strong>
+                                    <p class="text-xs">Encryption keys. Encrypts training data and model artifacts at
+                                        rest.</p>
+                                </li>
+                                <li class="bg-slate-50 p-2 rounded">
+                                    <strong class="text-red-600">VPC Endpoints (PrivateLink)</strong>
+                                    <p class="text-xs">Keeps traffic between your VPC and AWS services
+                                        (Bedrock/SageMaker) on the AWS PRIVATE network (not public internet).</p>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-blue-700 mb-3 border-b pb-2">Governance & Shared Responsibility
+                            </h3>
+                            <div class="bg-blue-50 p-3 rounded mb-4">
+                                <strong class="block text-blue-900 mb-2">AWS Responsibility (Security OF the
+                                    Cloud)</strong>
+                                <ul class="list-disc pl-4 text-xs text-blue-800">
+                                    <li>Physical Data Centers</li>
+                                    <li>The Compute/Storage infrastructure</li>
+                                    <li>The "Base" Foundation Models (Bedrock)</li>
+                                </ul>
+                            </div>
+                            <div class="bg-orange-50 p-3 rounded">
+                                <strong class="block text-orange-900 mb-2">Customer Responsibility (Security IN the
+                                    Cloud)</strong>
+                                <ul class="list-disc pl-4 text-xs text-orange-800">
+                                    <li>Your Data (Encryption)</li>
+                                    <li>Your Application (Front-end)</li>
+                                    <li>Preventing Prompt Injection</li>
+                                    <li>Verifying Model Output (Accuracy/Bias)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- ================= FLASHCARDS VIEW ================= -->
+        <div id="view-flashcards"
+            class="hidden container mx-auto max-w-4xl h-full flex flex-col items-center justify-center fade-in pb-20">
+            <div class="w-full max-w-lg mb-4 flex justify-between items-center">
+                <h2 class="text-2xl font-bold text-slate-700">Rapid Recall</h2>
+                <div class="text-slate-500 font-mono bg-white px-3 py-1 rounded shadow-sm">
+                    <span id="fc-counter">1</span> / <span id="fc-total">0</span>
+                </div>
+            </div>
+
+            <!-- Card -->
+            <div class="relative w-full max-w-xl h-72 group cursor-pointer perspective-1000" onclick="flipCard()">
+                <div id="flashcard-inner"
+                    class="relative w-full h-full duration-500 transform-style-3d shadow-xl rounded-2xl">
+                    <!-- Front -->
+                    <div
+                        class="absolute w-full h-full bg-white border-b-4 border-blue-500 rounded-2xl flex flex-col items-center justify-center p-8 backface-hidden">
+                        <span
+                            class="text-blue-500 text-xs font-bold tracking-widest uppercase mb-4 bg-blue-50 px-3 py-1 rounded-full">Concept</span>
+                        <h3 id="fc-front" class="text-3xl font-bold text-center text-slate-800">RAG</h3>
+                        <p class="text-slate-400 text-xs mt-8 flex items-center gap-1"><i
+                                class="fas fa-hand-pointer"></i>
+                            Click to flip</p>
+                    </div>
+                    <!-- Back -->
+                    <div
+                        class="absolute w-full h-full bg-slate-800 text-white rounded-2xl flex flex-col items-center justify-center p-8 rotate-y-180 backface-hidden">
+                        <span class="text-slate-400 text-xs font-bold tracking-widest uppercase mb-4">Definition</span>
+                        <p id="fc-back" class="text-lg text-center font-medium leading-relaxed">Retrieval Augmented
+                            Generation.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex space-x-6 mt-10">
+                <button onclick="prevCard()"
+                    class="w-12 h-12 flex items-center justify-center bg-white text-slate-600 rounded-full shadow hover:bg-slate-100 transition"><i
+                        class="fas fa-arrow-left"></i></button>
+                <button onclick="randomCard()"
+                    class="px-6 py-2 bg-slate-200 text-slate-700 rounded-full hover:bg-slate-300 transition text-sm font-bold">Shuffle</button>
+                <button onclick="nextCard()"
+                    class="w-12 h-12 flex items-center justify-center bg-aws-orange text-white rounded-full shadow hover:bg-orange-600 transition"><i
+                        class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <!-- ================= QUIZ VIEW ================= -->
+        <div id="view-quiz" class="hidden container mx-auto max-w-3xl fade-in pb-20 p-4">
+
+            <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+
+                <!-- Header -->
+                <div class="bg-slate-50 p-6 border-b border-slate-100 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800">Exam Simulator</h2>
+                        <p class="text-sm text-slate-500">Modeled after real exam scenarios</p>
+                    </div>
+                    <div class="flex items-center gap-2 bg-white px-3 py-1 rounded border border-slate-200">
+                        <span class="text-xs font-bold text-slate-400 uppercase">Score</span>
+                        <span id="score-display" class="font-bold text-xl text-blue-600">0</span>
+                    </div>
+                </div>
+
+                <!-- Intro State -->
+                <div id="quiz-intro" class="text-center p-12">
+                    <div class="inline-block p-6 rounded-full bg-blue-50 mb-6">
+                        <i class="fas fa-file-signature text-5xl text-blue-500"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3 text-slate-800">Full Practice Exam</h3>
+                    <p class="text-slate-600 mb-8 max-w-md mx-auto">30 Questions covering all domains. Detailed
+                        explanations provided for every answer to reinforce learning.</p>
+
+                    <button onclick="startQuiz()"
+                        class="bg-aws-orange hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-lg shadow-md transition transform hover:-translate-y-1 block mx-auto">
+                        Start Practice Exam
+                    </button>
+                </div>
+
+                <!-- Question State -->
+                <div id="quiz-container" class="hidden p-6 md:p-8">
+                    <div class="mb-6 flex justify-between items-end border-b border-slate-100 pb-4">
+                        <span class="text-sm font-mono text-slate-400">Question <span id="q-current"
+                                class="text-slate-800 font-bold">1</span> / <span id="q-total">30</span></span>
+                        <span id="q-domain"
+                            class="text-xs font-bold bg-slate-100 text-slate-600 px-2 py-1 rounded">Domain
+                            2</span>
+                    </div>
+
+                    <p id="q-text" class="text-lg font-medium text-slate-800 mb-8 leading-relaxed">Question text...</p>
+
+                    <div id="q-options" class="space-y-3">
+                        <!-- Options injected via JS -->
+                    </div>
+
+                    <!-- Feedback Area -->
+                    <div id="q-feedback"
+                        class="hidden mt-8 p-6 rounded-lg bg-blue-50 border border-blue-100 animate-fade-in">
+                        <div id="feedback-header" class="font-bold mb-2 text-lg"></div>
+                        <p id="feedback-text" class="text-sm text-slate-700 leading-relaxed"></p>
+                    </div>
+
+                    <div class="mt-8 flex justify-end">
+                        <button id="btn-next-q" onclick="nextQuestion()"
+                            class="hidden bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-8 rounded-lg transition shadow-lg flex items-center gap-2">
+                            Next Question <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Results State -->
+                <div id="quiz-results" class="hidden text-center p-12">
+                    <div id="result-icon" class="text-6xl mb-6"></div>
+                    <h3 class="text-3xl font-bold mb-2 text-slate-800">Exam Complete</h3>
+                    <p class="text-slate-500 mb-8">Here is how you performed:</p>
+
+                    <div class="flex justify-center items-center gap-4 mb-8">
+                        <div class="text-center">
+                            <span id="final-score" class="text-4xl font-bold text-slate-800">0</span>
+                            <span class="block text-xs text-slate-500 uppercase tracking-wide">Correct</span>
+                        </div>
+                        <div class="text-2xl text-slate-300">/</div>
+                        <div class="text-center">
+                            <span id="final-total" class="text-4xl font-bold text-slate-800">0</span>
+                            <span class="block text-xs text-slate-500 uppercase tracking-wide">Total</span>
+                        </div>
+                    </div>
+
+                    <div class="w-full max-w-xs mx-auto bg-slate-200 rounded-full h-4 mb-8 overflow-hidden">
+                        <div id="final-bar" class="bg-blue-600 h-4 rounded-full transition-all duration-1000"
+                            style="width: 0%"></div>
+                    </div>
+
+                    <div id="result-message" class="text-lg font-medium mb-8"></div>
+
+                    <button onclick="resetQuiz()"
+                        class="border-2 border-slate-300 text-slate-600 font-bold py-2 px-6 rounded-lg hover:bg-slate-50 transition">
+                        Retake Exam
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // ================= DATA =================
+
+        // Extended Flashcards (100+)
+        const flashcards = [
+            { front: "Model", back: "An AI computer program trained on data to recognize patterns or make predictions." },
+            { front: "Dataset", back: "The collection of information (images, text, numbers) used to teach the model." },
+            { front: "Training", back: "The process where a model 'learns' by looking at thousands of examples in a dataset." },
+            { front: "Inference", back: "Using a trained model to make predictions on NEW, unseen data (e.g., classifying a new photo)." },
+            { front: "Algorithm", back: "The 'recipe' or mathematical rules the model uses to learn from the data." },
+            { front: "LLM (Large Language Model)", back: "A model trained on massive amounts of text to understand and generate human-like language." },
+            { front: "Hallucination", back: "When an AI confidently makes up false information." },
+            { front: "Prompt", back: "The instruction or question you give to an AI model." },
+            { front: "RAG (Retrieval Augmented Generation)", back: "Retrieves external data to augment prompts. Reduces hallucinations and provides up-to-date info without retraining." },
+            { front: "Temperature", back: "Inference parameter. High (1.0) = Creative/Random. Low (0) = Factual/Deterministic." },
+            { front: "Top-P (Nucleus Sampling)", back: "Limits token choices to the cumulative probability P. Cuts off the 'long tail' of unlikely words." },
+            { front: "Fine-Tuning", back: "Retraining a pre-trained model on specific data to adapt behavior/style. Expensive. Updates weights." },
+            { front: "Amazon Bedrock", back: "Serverless service for accessing Foundation Models via API. Managed infrastructure." },
+            { front: "Amazon SageMaker", back: "Platform to build, train, and deploy custom ML models. Full control." },
+            { front: "SageMaker JumpStart", back: "Model Hub within SageMaker. One-click deploy of open source models." },
+            { front: "SageMaker Canvas", back: "No-code ML tool for business analysts to build models visually." },
+            { front: "AI (Artificial Intelligence)", back: "The broad field of creating systems that mimic human intelligence." },
+            { front: "Machine Learning (ML)", back: "A subset of AI where machines learn from data patterns without explicit programming." },
+            { front: "Deep Learning (DL)", back: "A subset of ML using multi-layered neural networks (mimicking the brain)." },
+            { front: "Generative AI", back: "AI that can CREATE new content (text, images, code) rather than just classifying it." },
+            { front: "LLM (Large Language Model)", back: "A type of AI trained on massive text data to understand and generate human language." },
+            { front: "Amazon Bedrock", back: "A fully managed service that offers Foundation Models from top AI startups and AWS via API." },
+            { front: "Amazon SageMaker", back: "The flagship AWS service for building, training, and deploying ML models from scratch." },
+            { front: "RAG (Retrieval-Augmented Generation)", back: "Connecting an LLM to your own private data (like PDFs) for more accurate answers." },
+            { front: "Fine-Tuning", back: "Taking a pre-trained model and training it further on a small, specific dataset to improve performance." },
+            { front: "Prompt", back: "The text input or instruction you give to an AI model." },
+            { front: "Amazon Polly", back: "Text-to-Speech service." },
+            { front: "Amazon Rekognition", back: "Image/Video analysis (Faces, Objects, Moderation)." },
+            { front: "Amazon Textract", back: "OCR service specialized for documents (Forms, Tables)." },
+            { front: "Amazon Comprehend", back: "NLP service (Sentiment, PII detection, Topics)." },
+            { front: "Amazon Personalize", back: "Real-time recommendation engine." },
+            { front: "Amazon Forecast", back: "Time-series forecasting (Demand, Weather, Inventory)." },
+            { front: "Amazon Kendra", back: "Intelligent enterprise search engine (finds answers in docs)." },
+            { front: "Reinforcement Learning", back: "Learning via trial and error (Rewards/Penalties)." },
+            { front: "Supervised Learning", back: "Learning from labeled data (Input + Output)." },
+            { front: "Unsupervised Learning", back: "Finding patterns in unlabeled data (Clustering)." },
+            { front: "Model Cards", back: "Documentation ('Nutrition Label') for models: intended use, limitations, risks." },
+            { front: "A2I (Augmented AI)", back: "Human-in-the-loop service for low-confidence predictions." },
+            { front: "Provisioned Throughput", back: "Bedrock pricing model. Reserved capacity for consistent performance." },
+            { front: "On-Demand Throughput", back: "Bedrock pricing model. Pay-per-token. Best for fluctuating workloads." },
+            { front: "Prompt Injection", back: "Security threat: Malicious input that tricks the model into ignoring instructions." },
+            { front: "SageMaker Ground Truth", back: "Service for human labeling of datasets." },
+            { front: "SageMaker Data Wrangler", back: "Prepares/Cleans data for ML with 300+ built-in transformations." },
+            { front: "SageMaker Autopilot", back: "AutoML service. Automates building, training, and tuning models." },
+            { front: "ROUGE Score", back: "Metric for evaluating text summarization quality." },
+            { front: "BLEU Score", back: "Metric for evaluating machine translation quality." },
+            { front: "Perplexity", back: "Metric for evaluating text generation. Lower is better." },
+            { front: "Selection Bias", back: "Error when training data is not representative of population." },
+            { front: "AWS CloudTrail", back: "Logs ALL API calls. Answers 'Who, What, When?'" },
+            { front: "AWS Config", back: "Records configuration changes for compliance." },
+            { front: "AWS PrivateLink", back: "Private connection within AWS network (no public internet)." },
+            { front: "Quantization", back: "Reducing model precision (size) to save memory/cost." },
+            { front: "Context Window", back: "The limit of tokens a model can 'keep in mind' for a single session." },
+            { front: "Parameter", back: "Internal variables learned by the model during training. More parameters often = more power." },
+            { front: "Hyperparameter", back: "Settings you choose BEFORE training (e.g., learning rate) to control the process." },
+            { front: "Neural Network", back: "Layers of software 'neurons' that mimic the way human brains process information." },
+            { front: "Multi-Modal", back: "A model that can process multiple types of data (e.g., both text AND images)." },
+            { front: "Tokenization", back: "Breaking down text into smaller units (tokens) for the model to understand." },
+            { front: "VPC (Virtual Private Cloud)", back: "Your private corner of the AWS cloud." },
+            { front: "Shared Responsibility Model", back: "AWS secures the cloud, YOU secure what's IN the cloud (Data, Apps)." },
+            { front: "PII (Personally Identifiable Information)", back: "Sensitive data like names, emails, SSNs." },
+            { front: "Amazon Macie", back: "Service that uses ML to find PII in S3 buckets." },
+            { front: "AWS KMS", back: "Service for managing encryption keys." },
+            { front: "SageMaker Model Cards", back: "Documentation for transparency (intended use, bias, risks)." },
+            { front: "Guardrails", back: "Bedrock feature to filter harmful content." },
+            { front: "Prompt Engineering", back: "The art of writing better prompts to get better AI results." },
+            { front: "Batch Inference", back: "Processing massive amounts of data at once (not real-time)." },
+            { front: "Real-time Inference", back: "Getting a prediction immediately (e.g., credit card fraud check)." },
+            { front: "Foundation Model (FM)", back: "A massive, pre-trained model that can do many different tasks." },
+            { front: "AWS Bedrock Agents", back: "Can execute multi-step business tasks by calling APIs." },
+            { front: "Data Drift", back: "When the real-world data starts to differ from the training data, hurting model accuracy." },
+            { front: "Model Drift", back: "When a model's performance slowly degrades over time in production." },
+            { front: "Clustering", back: "Unsupervised learning task to group similar items (e.g., 'luxury buyers' vs 'value buyers')." },
+            { front: "Classification", back: "Supervised learning task to put data into categories (e.g., 'Spam' or 'Not Spam')." },
+            { front: "Regression", back: "Supervised learning task to predict a specific number (e.g., 'Price' or 'Sales Total')." },
+            { front: "S3 (Simple Storage Service)", back: "The 'hard drive' of the cloud where datasets are typically stored." },
+            { front: "IAM (Identity & Access Management)", back: "Controls WHO can access WHAT in AWS." },
+            { front: "SageMaker Studio", back: "The full coding IDE for data scientists." },
+            { front: "Recall vs Precision", back: "Recall = Catching ALL (Safety). Precision = Being CORRECT (Spam filter)." },
+            { front: "Transformer", back: "The specific 'Engine' architecture behind modern GenAI/LLMs." },
+            // NEW BATCh (100+ Total)
+            { front: "SageMaker Clarify", back: "Detects bias and explains model predictions (SHAP values)." },
+            { front: "SageMaker Canvas", back: "Visual, no-code interface for business analysts to build ML models." },
+            { front: "SageMaker JumpStart", back: "A hub to find and deploy pre-trained models with 1-click." },
+            { front: "SageMaker Feature Store", back: "Centralized place to store and share ML data features." },
+            { front: "Amazon Lex", back: "Service for building conversational interfaces (chatbots) using voice/text." },
+            { front: "Amazon Transcribe", back: "Speech-to-Text service." },
+            { front: "Amazon Translate", back: "Neural machine translation service." },
+            { front: "SageMaker Model Monitor", back: "Detects data and model drift in real-time." },
+            { front: "AWS Glue", back: "Serverless data integration service (ETL - Extract, Transform, Load)." },
+            { front: "Amazon Athena", back: "Interactive query service to analyze data in S3 using SQL." },
+            { front: "SageMaker Pipelines", back: "The first purpose-built CI/CD service for ML (MLOps)." },
+            { front: "SHAP Values", back: "A mathematical way to explain how much each feature contributed to a prediction." },
+            { front: "Confusion Matrix", back: "A table used to describe the performance of a classification model." },
+            { front: "Overfitting", back: "When a model learns training data too well (including noise) and fails on new data." },
+            { front: "Underfitting", back: "When a model is too simple to learn the patterns in the data." },
+            { front: "Learning Rate", back: "A hyperparameter that controls how much to change the model in response to the estimated error." },
+            { front: "Loss Function", back: "A method of evaluating how well your algorithm models your dataset." },
+            { front: "Temperature", back: "A parameter (0 to 1) that controls the 'creativity' or randomness of an LLM." },
+            { front: "Top-P (Nucleus Sampling)", back: "Limits choices to a subset of tokens whose total probability meets a threshold." },
+            { front: "Top-K", back: "Limits choices to the most likely 'K' next tokens." },
+            { front: "Stop Sequences", back: "Specific strings that, when generated, tell the model to stop talking." },
+            { front: "Hallucination", back: "When an AI model generates confident but false or nonsensical information." },
+            { front: "Zero-Shot Prompting", back: "Asking the model to do a task WITHOUT giving it any examples." },
+            { front: "Few-Shot Prompting", back: "Asking the model to do a task by giving it a FEW examples first." },
+            { front: "Chain of Thought", back: "Prompting the model to 'think step by step' for complex reasoning." },
+            { front: "System Prompt", back: "Instructions that set the behavior, persona, and rules for the model." },
+            { front: "Knowledge Bases for Bedrock", back: "Managed RAG: Connects FMs to your data sources for context." },
+            { front: "Spot Instances", back: "Unused EC2 capacity available for up to 90% discount (can be interrupted)." },
+            { front: "AWS Artifact", back: "Self-service portal for on-demand access to AWS compliance reports." },
+            { front: "Amazon Fraud Detector", back: "Service to identify potentially fraudulent online activities." },
+            { front: "Amazon Q Developer", back: "AI-powered coding assistant (formerly CodeWhisperer)." },
+            { front: "Amazon Q Business", back: "AI assistant that can answer questions based on enterprise data." },
+            { front: "Watermarking", back: "Invisible signal embedded in AI-generated images to identify them as AI." },
+            { front: "F1 Score", back: "The harmonic mean of Precision and Recall. Best for imbalanced data." },
+            { front: "Latency", back: "The time it takes for a system to respond to a request (lower is better)." },
+            { front: "Throughput", back: "The amount of data processed or tokens generated over a period of time." },
+            { front: "Drift", back: "The degradation of model performance over time due to changes in the environment." },
+            { front: "Feature Engineering", back: "Selecting or transforming raw data into better 'features' for ML." },
+            { front: "Inference", back: "The process of using a trained model to make predictions on new data." },
+            { front: "Training Data", back: "The initial data used to teach the model how to predict." },
+            { front: "Validation Data", back: "Data used to tune hyperparameters and prevent overfitting during training." },
+            { front: "Test Data", back: "Data used at the very end to see how the model performs on unseen examples." }
+        ];
+
+        // 30 High-Quality Questions modeled after the PDF content
+        const questions = [
+            {
+                text: "Which of the following describes the relationship between AI, Machine Learning (ML), and Deep Learning (DL)?",
+                domain: "Domain 1",
+                options: ["They are three completely different fields", "AI is a subset of ML, which is a subset of DL", "DL is a subset of ML, which is a subset of AI", "ML and DL are the same thing"],
+                correct: 2,
+                explanation: "<strong>AI</strong> is the broad field. <strong>ML</strong> is a subset of AI. <strong>DL</strong> is a subset of ML. Think of it like circles within circles."
+            },
+            {
+                text: "A non-technical manager wants to understand more about 'Generative AI'. Which of the following is the best definition?",
+                domain: "Domain 2",
+                options: ["AI that can only classify images as cats or dogs", "AI that creates NEW content like text, images, or code", "AI that requires manual coding for every answer", "AI that only works with numbers and spreadsheets"],
+                correct: 1,
+                explanation: "<strong>Generative AI</strong> is defined by its ability to <em>create</em> new content rather than just analyzing existing data."
+            },
+            {
+                text: "A startup wants to build an app that summarizes PDF documents uploaded by users. They have no ML expertise and want to use a leading model like Anthropic Claude with zero infrastructure management. Which service is best?",
+                domain: "Domain 3",
+                options: ["SageMaker JumpStart", "Amazon Bedrock", "Amazon Comprehend", "Amazon Textract"],
+                correct: 1,
+                explanation: "<strong>Amazon Bedrock</strong> is the fully managed, serverless way to access Foundation Models (like Claude) via API. SageMaker requires more setup. Textract extracts text but doesn't summarize."
+            },
+            {
+                text: "You are building a customer support chatbot. You need to ensure the bot NEVER mentions your competitor's name, 'AcmeCorp'. What is the most reliable way to enforce this across all models you might test?",
+                domain: "Domain 4",
+                options: ["Prompt Engineering (System Prompt)", "Guardrails for Amazon Bedrock", "SageMaker Clarify", "Fine-tuning the model"],
+                correct: 1,
+                explanation: "<strong>Guardrails for Bedrock</strong> can block specific words or topics (Denied Topics) independently of the model. Prompt engineering is less reliable (can be bypassed)."
+            },
+            {
+                text: "A financial firm needs to analyze stock market trends. They have a dataset of historical prices and want to predict future prices for the next 30 days. Which learning type is this?",
+                domain: "Domain 1",
+                options: ["Classification (Supervised)", "Regression (Supervised)", "Clustering (Unsupervised)", "Reinforcement Learning"],
+                correct: 1,
+                explanation: "Predicting a specific number (price) based on historical data is a <strong>Regression</strong> task (Supervised Learning). Classification is for categories (Up/Down)."
+            },
+            {
+                text: "Your LLM application is providing outdated answers about AWS pricing. You have a PDF with the new pricing. You want to fix this without spending $10,000 on training. What should you implement?",
+                domain: "Domain 2",
+                options: ["Fine-Tuning", "RAG (Retrieval Augmented Generation)", "Pre-training", "Reinforcement Learning from Human Feedback"],
+                correct: 1,
+                explanation: "<strong>RAG</strong> connects the model to external data (your PDF). It is cheaper, faster, and solves the 'knowledge cutoff' issue. Fine-tuning is expensive and overkill for simple fact updates."
+            },
+            {
+                text: "Which AWS service helps Business Analysts build machine learning models for prediction without writing a single line of code?",
+                domain: "Domain 3",
+                options: ["SageMaker Studio", "SageMaker Canvas", "Amazon Q Developer", "AWS Cloud9"],
+                correct: 1,
+                explanation: "<strong>SageMaker Canvas</strong> is specifically designed as a No-Code visual interface for business analysts."
+            },
+            {
+                text: "You are using an LLM to generate Python code. The output varies too much every time you run it. You need consistent, executable code. How should you adjust the parameters?",
+                domain: "Domain 2",
+                options: ["Increase Temperature to 1.0", "Decrease Temperature to 0", "Increase Top-P", "Use a smaller Context Window"],
+                correct: 1,
+                explanation: "For code generation, you want deterministic outputs. <strong>Temperature = 0</strong> minimizes randomness."
+            },
+            {
+                text: "A hospital uses an ML model to detect rare diseases. It is critical that they do NOT miss a positive case, even if it means flagging some healthy people as sick. Which metric should they maximize?",
+                domain: "Domain 1",
+                options: ["Precision", "Recall", "Accuracy", "Specificity"],
+                correct: 1,
+                explanation: "<strong>Recall</strong> (Sensitivity) measures the ability to catch all positive cases. Missing a disease (False Negative) is the worst outcome, so high Recall is required."
+            },
+            {
+                text: "What is the primary role of 'Embeddings' in a RAG architecture?",
+                domain: "Domain 2",
+                options: ["To compress the data", "To encrypt the data", "To convert text into vectors for semantic search", "To translate text into different languages"],
+                correct: 2,
+                explanation: "<strong>Embeddings</strong> convert text into numerical vectors. In RAG, we search for documents with vectors similar to the query vector (Semantic Search)."
+            },
+            {
+                text: "Which SageMaker tool is used to detect bias in your training data (e.g., gender imbalance) before you even train the model?",
+                domain: "Domain 4",
+                options: ["SageMaker JumpStart", "SageMaker Clarify", "SageMaker Edge Manager", "SageMaker Pipelines"],
+                correct: 1,
+                explanation: "<strong>SageMaker Clarify</strong> detects bias in pre-training data and post-training models, and provides model explainability."
+            },
+            {
+                text: "A developer needs to extract data from scanned insurance forms, including handwritten notes and tables. Which service is best suited?",
+                domain: "Domain 3",
+                options: ["Amazon Rekognition", "Amazon Textract", "Amazon Comprehend", "Amazon Kendra"],
+                correct: 1,
+                explanation: "<strong>Amazon Textract</strong> is an OCR service optimized for documents, forms, and tables. Rekognition is for images/scenes."
+            },
+            {
+                text: "What is the key benefit of 'Prompt Caching' in Amazon Bedrock?",
+                domain: "Domain 2",
+                options: ["It automatically fine-tunes the model", "It reduces cost and latency for repetitive large prompts", "It increases the context window size", "It generates images faster"],
+                correct: 1,
+                explanation: "<strong>Prompt Caching</strong> allows you to reuse the processed state of a large prompt (like a system instruction), saving compute time (latency) and cost."
+            },
+            {
+                text: "Which feature of Amazon Bedrock allows you to compare the outputs of two different models side-by-side to choose the best one?",
+                domain: "Domain 4",
+                options: ["Model Evaluation", "Guardrails", "Knowledge Bases", "Agents"],
+                correct: 0,
+                explanation: "<strong>Model Evaluation</strong> in Bedrock allows for both automated and human-based evaluation of different models."
+            },
+            {
+                text: "You are building a solution to categorize customer emails as 'Urgent', 'Complaint', or 'Inquiry'. You have 5,000 labeled emails. What type of ML task is this?",
+                domain: "Domain 1",
+                options: ["Unsupervised Clustering", "Supervised Classification", "Reinforcement Learning", "Supervised Regression"],
+                correct: 1,
+                explanation: "This is <strong>Supervised Classification</strong> because you have labels (Supervised) and are sorting into categories (Classification)."
+            },
+            {
+                text: "Which service enables you to build a custom search engine for your internal corporate documents (Wikis, SharePoint, S3) using natural language?",
+                domain: "Domain 3",
+                options: ["Amazon OpenSearch", "Amazon Kendra", "Amazon Connect", "Amazon Lex"],
+                correct: 1,
+                explanation: "<strong>Amazon Kendra</strong> is the intelligent enterprise search service powered by ML."
+            },
+            {
+                text: "What does the 'F1 Score' represent?",
+                domain: "Domain 1",
+                options: ["The total accuracy of the model", "The harmonic mean of Precision and Recall", "The training time of the model", "The ratio of True Positives to False Positives"],
+                correct: 1,
+                explanation: "The <strong>F1 Score</strong> balances Precision and Recall. It is especially useful when the class distribution is uneven (imbalanced data)."
+            },
+            {
+                text: "Which prompt engineering technique involves giving the model a 'persona' (e.g., 'You are an expert tax accountant')?",
+                domain: "Domain 2",
+                options: ["Chain of Thought", "Zero-Shot", "System Prompting / Persona", "RAG"],
+                correct: 2,
+                explanation: "Defining the role or <strong>Persona</strong> (usually in the System Prompt) sets the context and style for the model's responses."
+            },
+            {
+                text: "A company wants to use a Foundation Model but is legally required to ensure their data never leaves their VPC and is encrypted with their own keys (KMS). Which service supports this?",
+                domain: "Domain 4",
+                options: ["ChatGPT Public", "Amazon Bedrock", "HuggingFace Public Hub", "Claude.ai"],
+                correct: 1,
+                explanation: "<strong>Amazon Bedrock</strong> is enterprise-grade. It supports VPC endpoints (PrivateLink) and KMS encryption, keeping data secure."
+            },
+            {
+                text: "Which Amazon Q feature helps developers upgrade Java versions or convert code from one language to another?",
+                domain: "Domain 3",
+                options: ["Amazon Q Business", "Amazon Q Developer (Code Transformation)", "Amazon Q in QuickSight", "Amazon Q Supply Chain"],
+                correct: 1,
+                explanation: "<strong>Amazon Q Developer</strong> includes 'Code Transformation' agents that can upgrade Java versions or port code."
+            },
+            {
+                text: "What is the main disadvantage of 'Fine-Tuning' compared to RAG?",
+                domain: "Domain 2",
+                options: ["Fine-tuning cannot change the style of the model", "Fine-tuning is expensive and requires high-quality labeled data", "Fine-tuning increases hallucinations", "Fine-tuning reduces the context window"],
+                correct: 1,
+                explanation: "<strong>Fine-tuning</strong> is computationally expensive and requires a curated dataset. RAG is generally cheaper and easier for adding knowledge."
+            },
+            {
+                text: "Which AI service helps detect online fraud such as fake account creation or loyalty program abuse?",
+                domain: "Domain 3",
+                options: ["Amazon Detective", "Amazon Fraud Detector", "Amazon GuardDuty", "Amazon Inspector"],
+                correct: 1,
+                explanation: "<strong>Amazon Fraud Detector</strong> is a fully managed service specifically for detecting fraud patterns."
+            },
+            {
+                text: "In the Shared Responsibility Model for AI, who is responsible for checking the output of the model for bias and accuracy?",
+                domain: "Domain 4",
+                options: ["AWS", "The Customer", "The Model Provider (e.g., Anthropic)", "The End User"],
+                correct: 1,
+                explanation: "AWS secures the infrastructure. <strong>The Customer</strong> is responsible for the application, data, and validating the model's output (Responsible AI)."
+            },
+            {
+                text: "What is 'SageMaker Data Wrangler' used for?",
+                domain: "Domain 3",
+                options: ["Training models", "Deploying endpoints", "Preparing and cleaning data", "Labeling data"],
+                correct: 2,
+                explanation: "<strong>Data Wrangler</strong> is a low-code tool to import, clean, and transform data before training."
+            },
+            {
+                text: "Which pricing model in Bedrock allows you to reserve a specific number of model units to ensure consistent performance for high-volume apps?",
+                domain: "Domain 3",
+                options: ["On-Demand", "Spot Instances", "Provisioned Throughput", "Savings Plans"],
+                correct: 2,
+                explanation: "<strong>Provisioned Throughput</strong> guarantees capacity (Model Units) for a fixed term, ensuring consistent latency."
+            },
+            {
+                text: "A model is predicting that every single email is 'Not Spam' because 99% of the training data was 'Not Spam'. What is this issue called?",
+                domain: "Domain 4",
+                options: ["Hallucination", "Class Imbalance / Bias", "Overfitting", "Vanishing Gradient"],
+                correct: 1,
+                explanation: "This is <strong>Class Imbalance</strong> leading to bias. The model achieves high accuracy by cheating (always guessing the majority class)."
+            },
+            {
+                text: "Which Bedrock component enables FM's to execute multi-step tasks (e.g., 'Book a flight and send an email') by using API calls?",
+                domain: "Domain 2",
+                options: ["Knowledge Bases", "Agents", "Guardrails", "Playgrounds"],
+                correct: 1,
+                explanation: "<strong>Agents</strong> for Amazon Bedrock can break down tasks, reason, and make API calls to external systems to perform actions."
+            },
+            {
+                text: "What is 'SageMaker Autopilot'?",
+                domain: "Domain 3",
+                options: ["A tool to automatically write Python code", "An AutoML service that automatically builds, trains, and tunes models", "A tool to pilot drones", "A dashboard for monitoring costs"],
+                correct: 1,
+                explanation: "<strong>SageMaker Autopilot</strong> is an AutoML (Automated Machine Learning) solution that handles the entire pipeline automatically."
+            },
+            {
+                text: "If you want to mask PII (Personally Identifiable Information) in a text document before analyzing it, which service offers this natively?",
+                domain: "Domain 3",
+                options: ["Amazon Polly", "Amazon Comprehend", "Amazon Translate", "Amazon Personalize"],
+                correct: 1,
+                explanation: "<strong>Amazon Comprehend</strong> has native PII detection and redaction capabilities."
+            },
+            {
+                text: "What defines 'Top-K' sampling?",
+                domain: "Domain 2",
+                options: ["It selects the top K% of probability", "It selects from the top K most likely next tokens", "It selects K random words", "It repeats the K previous words"],
+                correct: 1,
+                explanation: "<strong>Top-K</strong> limits the pool of next-token choices to the 'K' most probable words (e.g., the top 50)."
+            },
+            {
+                text: "Which service allows you to create high-quality training datasets by managing a workforce of human labelers?",
+                domain: "Domain 3",
+                options: ["SageMaker Ground Truth", "SageMaker Clarify", "Amazon Mechanical Turk", "SageMaker Labeler"],
+                correct: 0,
+                explanation: "<strong>SageMaker Ground Truth</strong> helps build labeled datasets using human workers (private, vendor, or Mechanical Turk)."
+            },
+            {
+                text: "What is 'Watermarking' in the context of Responsible AI?",
+                domain: "Domain 4",
+                options: ["Protecting physical hardware from water", "Embedding an invisible signal into AI-generated content to identify its origin", "Adding a visible logo to every image", "Cleaning data lakes"],
+                correct: 1,
+                explanation: "<strong>Watermarking</strong> (like in Bedrock Titan Image Generator) adds an invisible signal to indicate that content was AI-generated."
+            },
+            {
+                text: "Your company requires that all API calls to Amazon Bedrock be logged for compliance auditing. Which service should you enable?",
+                domain: "Domain 5",
+                options: ["Amazon CloudWatch", "AWS CloudTrail", "AWS Config", "Amazon Inspector"],
+                correct: 1,
+                explanation: "<strong>AWS CloudTrail</strong> logs all API activity (management and data events), answering 'who made the call, when, and from where'."
+            },
+            {
+                text: "A bank wants to use a Foundation Model but security policy forbids sending data over the public internet. What feature should they use?",
+                domain: "Domain 5",
+                options: ["VPN", "Direct Connect", "VPC Endpoints (PrivateLink)", "Internet Gateway"],
+                correct: 2,
+                explanation: "<strong>VPC Endpoints (PrivateLink)</strong> keep traffic between your VPC and AWS services entirely within the AWS network, avoiding the public internet."
+            },
+            {
+                text: "You want to teach a model to write code in a proprietary internal language that it has never seen before. You need high accuracy and specific syntax adherence. What is the best approach?",
+                domain: "Domain 3",
+                options: ["RAG (Retrieval Augmented Generation)", "Fine-Tuning", "Prompt Engineering", "Zero-Shot Prompting"],
+                correct: 1,
+                explanation: "<strong>Fine-Tuning</strong> is best when you need to teach the model a NEW behavior, language, or complex format that it wasn't pre-trained on."
+            },
+            {
+                text: "According to the detailed AWS Shared Responsibility Model for AI, which of the following is the Customer's responsibility?",
+                domain: "Domain 5",
+                options: ["Physical security of the data centers", "Patching the OS of the SageMaker managed instances", "Encrypting their own training data", "Maintenance of the underlying Bedrock hardware"],
+                correct: 2,
+                explanation: "The <strong>Customer</strong> is always responsible for their own data (encryption, access control). AWS handles the physical infrastructure and managed service patching."
+            },
+            {
+                text: "Which metric is commonly used to evaluate the quality of a Machine Translation model (e.g., translating English to Spanish)?",
+                domain: "Domain 3",
+                options: ["ROUGE", "BLEU", "Accuracy", "Recall"],
+                correct: 1,
+                explanation: "<strong>BLEU</strong> (Bilingual Evaluation Understudy) is the standard metric for comparing machine-translated text to human reference translations. ROUGE is for summarization."
+            },
+            {
+                text: "You want to use a model that handles both audio and text at the same time. What is this type of model called?",
+                domain: "Domain 2",
+                options: ["Multi-task Model", "Multi-modal Model", "Transformer Model", "Recursive Model"],
+                correct: 1,
+                explanation: "<strong>Multi-modal</strong> models can process more than one type of data (e.g., text, image, audio) simultaneously."
+            },
+            {
+                text: "In AWS, what is the best service to 'discover' if your S3 buckets contain sensitive data like credit card numbers?",
+                domain: "Domain 5",
+                options: ["Amazon GuardDuty", "Amazon Macie", "AWS Shield", "Amazon Inspector"],
+                correct: 1,
+                explanation: "<strong>Amazon Macie</strong> is specifically designed to use ML to discover and protect sensitive data in S3."
+            },
+            {
+                text: "What is the primary difference between a Foundation Model (FM) and a standard ML model?",
+                domain: "Domain 2",
+                options: ["FM is smaller", "FM is pre-trained on massive data for general tasks", "Standard models are only for images", "FMs don't need GPUs"],
+                correct: 1,
+                explanation: "<strong>Foundation Models</strong> are enormous, pre-trained models that provide a base for many different downstream tasks."
+            },
+            {
+                text: "A project requires a model to 'think step-by-step' to solve a math problem. Which technique is this?",
+                domain: "Domain 2",
+                options: ["Zero-Shot", "Few-Shot", "Chain of Thought (CoT)", "RAG"],
+                correct: 2,
+                explanation: "<strong>Chain of Thought</strong> prompting encourages the model to break down complex logic into sequential steps."
+            },
+            {
+                text: "Which AWS tool provides a 'Nutrition Label' style document for a model, detailing its intended use and risks?",
+                domain: "Domain 4",
+                options: ["SageMaker Model Monitor", "SageMaker Model Cards", "Amazon Q Business", "AWS Config"],
+                correct: 1,
+                explanation: "<strong>SageMaker Model Cards</strong> provide standardized documentation for model transparency and governance."
+            },
+            {
+                text: "What is 'Perplexity' in LLM evaluation?",
+                domain: "Domain 2",
+                options: ["A measure of how confused the user is", "A measure of how well a probability model predicts a sample (lower is better)", "The speed of token generation", "The cost per 1000 tokens"],
+                correct: 1,
+                explanation: "<strong>Perplexity</strong> measures how well a model predicts text. A lower score means the model is less 'surprised' by the data, indicating better performance."
+            },
+            {
+                text: "You need to process 10 million records once a week to generate a report. You don't need real-time results. Which inference type is most cost-effective?",
+                domain: "Domain 1",
+                options: ["Real-time Inference", "Batch Inference", "Serverless Inference", "Asynchronous Inference"],
+                correct: 1,
+                explanation: "<strong>Batch Inference</strong> is designed for high-volume, non-latency-sensitive processing, making it more cost-effective for periodic reports."
+            },
+            {
+                text: "Which bias occurs when the data used to train a model doesn't represent the population it will serve?",
+                domain: "Domain 4",
+                options: ["Reporting Bias", "Selection Bias", "Automation Bias", "Confirmation Bias"],
+                correct: 1,
+                explanation: "<strong>Selection Bias</strong> happens when the training sample is not representative of the real-world population."
+            },
+            {
+                text: "What is 'Quantization' in the context of model deployment?",
+                domain: "Domain 3",
+                options: ["Increasing the number of parameters", "Reducing the precision of model weights (e.g., from 32-bit to 8-bit) to save memory", "Adding more layers to a neural network", "Training on more data"],
+                correct: 1,
+                explanation: "<strong>Quantization</strong> compresses models by using fewer bits for numbers, making them smaller and faster for deployment."
+            },
+            {
+                text: "Which Amazon Q application is designed to help employees find answers across their company's private data sources?",
+                domain: "Domain 3",
+                options: ["Amazon Q Developer", "Amazon Q Business", "Amazon Q Supply Chain", "Amazon Q in Connect"],
+                correct: 1,
+                explanation: "<strong>Amazon Q Business</strong> connects to enterprise data stores to answer employee questions securely."
+            },
+            {
+                text: "You want to evaluate a model's toxicity and safety using human reviewers. Which Bedrock feature supports this?",
+                domain: "Domain 4",
+                options: ["Guardrails", "Model Evaluation (Human)", "Provisioned Throughput", "Knowledge Bases"],
+                correct: 1,
+                explanation: "Amazon Bedrock supports **Human Model Evaluation**, where your own employees or AWS-managed teams review model outputs for safety."
+            },
+            {
+                text: "What is the 'Context Window' limit?",
+                domain: "Domain 2",
+                options: ["The number of GPUs used", "The total training data size", "The maximum number of tokens a model can process in one interaction", "The speed of the network"],
+                correct: 2,
+                explanation: "The **Context Window** is the memory limit for a single conversation or input. If exceeds, the model 'forgets' the earliest parts."
+            },
+            {
+                text: "Which AWS service can automatically group customer photos into folders based on whether they contain 'Sunsets', 'Dogs', or 'Cars'?",
+                domain: "Domain 3",
+                options: ["Amazon Rekognition", "Amazon Polly", "Amazon Comprehend", "Amazon Lex"],
+                correct: 0,
+                explanation: "<strong>Amazon Rekognition</strong> specializes in computer vision, recognizing objects, scenes, and faces in images."
+            }
+        ];
+
+        // --- Scroll to Section ---
+        function scrollToSection(id) {
+            switchTab('study');
+            const section = document.getElementById(`section-${id}`);
+            const content = document.getElementById(`content-${id}`);
+
+            if (section) {
+                // Open if closed
+                if (content && content.classList.contains('hidden')) {
+                    toggleSection(id);
+                }
+
+                // Allow time for DOM update/render if necessary, though scrollIntoView usually fine
+                setTimeout(() => {
+                    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            }
+        }
+
+        // --- Tabs ---
+        function switchTab(tabId) {
+            // Hide all views
+            const views = ['view-study', 'view-flashcards', 'view-quiz'];
+            views.forEach(id => {
+                const view = document.getElementById(id);
+                if (view) view.classList.add('hidden');
+            });
+
+            // Show selected view
+            const selectedView = document.getElementById(`view-${tabId}`);
+            if (selectedView) {
+                selectedView.classList.remove('hidden');
+            }
+
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('tab-active');
+            });
+            document.getElementById(`tab-${tabId}`).classList.add('tab-active');
+
+            // Reset scroll position
+            document.getElementById('main-container').scrollTop = 0;
+        }
+
+        // --- Accordions ---
+        function toggleSection(id) {
+            const content = document.getElementById(`content-${id}`);
+            const icon = document.getElementById(`icon-${id}`);
+            content.classList.toggle('hidden');
+            icon.classList.toggle('rotate-180');
+        }
+
+        // --- Flashcards ---
+        let currentCard = 0;
+        let isFlipped = false;
+
+        document.getElementById('fc-total').innerText = flashcards.length;
+
+        function updateCard() {
+            const inner = document.getElementById('flashcard-inner');
+            const front = document.getElementById('fc-front');
+            const back = document.getElementById('fc-back');
+            const counter = document.getElementById('fc-counter');
+
+            inner.classList.remove('rotate-y-180');
+            isFlipped = false;
+
+            // Small delay to hide change behind flip animation if needed
+            setTimeout(() => {
+                front.textContent = flashcards[currentCard].front;
+                back.textContent = flashcards[currentCard].back;
+                counter.textContent = currentCard + 1;
+            }, 200);
+        }
+
+        function flipCard() {
+            const inner = document.getElementById('flashcard-inner');
+            isFlipped = !isFlipped;
+            inner.classList.toggle('rotate-y-180');
+        }
+
+        function nextCard() {
+            currentCard = (currentCard + 1) % flashcards.length;
+            updateCard();
+        }
+
+        function prevCard() {
+            currentCard = (currentCard - 1 + flashcards.length) % flashcards.length;
+            updateCard();
+        }
+
+        function randomCard() {
+            currentCard = Math.floor(Math.random() * flashcards.length);
+            updateCard();
+        }
+
+        // --- Quiz ---
+        function startQuiz() {
+            score = 0;
+            currentQuestionIndex = 0;
+            document.getElementById('score-display').innerText = 0;
+            document.getElementById('quiz-intro').classList.add('hidden');
+            document.getElementById('quiz-results').classList.add('hidden');
+            document.getElementById('quiz-container').classList.remove('hidden');
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const q = questions[currentQuestionIndex];
+
+            // Update Headers
+            document.getElementById('q-current').innerText = currentQuestionIndex + 1;
+            document.getElementById('q-total').innerText = questions.length;
+            document.getElementById('q-domain').innerText = q.domain;
+            document.getElementById('q-text').innerText = q.text;
+
+            // Reset UI
+            document.getElementById('q-feedback').classList.add('hidden');
+            document.getElementById('btn-next-q').classList.add('hidden');
+
+            // Render Options
+            const container = document.getElementById('q-options');
+            container.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 rounded-lg border-2 border-slate-200 hover:border-blue-300 hover:bg-blue-50 transition flex items-center group bg-white";
+                btn.onclick = () => checkAnswer(idx, btn);
+                btn.innerHTML = `
+                    <div class="w-6 h-6 rounded-full border-2 border-slate-300 mr-4 flex items-center justify-center text-xs font-bold text-slate-500 group-hover:border-blue-400">
+                        ${String.fromCharCode(65 + idx)}
+                    </div>
+                    <span class="text-slate-700 font-medium">${opt}</span>
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedIdx, btnElement) {
+            const q = questions[currentQuestionIndex];
+            const allBtns = document.getElementById('q-options').children;
+
+            // Disable all
+            for (let btn of allBtns) {
+                btn.disabled = true;
+                btn.classList.add('opacity-70', 'cursor-not-allowed');
+            }
+
+            const feedback = document.getElementById('q-feedback');
+            const header = document.getElementById('feedback-header');
+            const text = document.getElementById('feedback-text');
+            const nextBtn = document.getElementById('btn-next-q');
+
+            // Correct?
+            if (selectedIdx === q.correct) {
+                score++;
+                document.getElementById('score-display').innerText = score;
+
+                btnElement.classList.remove('border-slate-200', 'bg-white');
+                btnElement.classList.add('border-green-500', 'bg-green-50');
+                btnElement.querySelector('div').classList.add('border-green-500', 'text-green-600');
+                btnElement.querySelector('div').innerHTML = '<i class="fas fa-check"></i>';
+
+                header.innerHTML = '<i class="fas fa-check-circle text-green-600 mr-2"></i>Correct!';
+                header.className = "font-bold mb-2 text-lg text-green-700";
+            } else {
+                btnElement.classList.remove('border-slate-200', 'bg-white');
+                btnElement.classList.add('border-red-500', 'bg-red-50');
+                btnElement.querySelector('div').classList.add('border-red-500', 'text-red-600');
+                btnElement.querySelector('div').innerHTML = '<i class="fas fa-times"></i>';
+
+                // Highlight correct one
+                const correctBtn = allBtns[q.correct];
+                correctBtn.classList.remove('border-slate-200', 'bg-white', 'opacity-70');
+                correctBtn.classList.add('border-green-500', 'bg-green-50');
+                correctBtn.querySelector('div').classList.add('border-green-500', 'text-green-600');
+                correctBtn.querySelector('div').innerHTML = '<i class="fas fa-check"></i>';
+
+                header.innerHTML = '<i class="fas fa-times-circle text-red-600 mr-2"></i>Incorrect';
+                header.className = "font-bold mb-2 text-lg text-red-700";
+            }
+
+            text.innerHTML = q.explanation;
+            feedback.classList.remove('hidden');
+            nextBtn.classList.remove('hidden');
+
+            // Auto scroll to feedback
+            nextBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quiz-container').classList.add('hidden');
+            document.getElementById('quiz-results').classList.remove('hidden');
+
+            const percent = Math.round((score / questions.length) * 100);
+
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('final-total').innerText = questions.length;
+            document.getElementById('final-bar').style.width = `${percent}%`;
+
+            const icon = document.getElementById('result-icon');
+            const msg = document.getElementById('result-message');
+
+            if (percent >= 70) {
+                icon.innerHTML = '<i class="fas fa-trophy text-yellow-500 animate-bounce"></i>';
+                msg.innerText = "Congratulations! You are ready for the AIF-C01!";
+                msg.className = "text-xl font-bold text-green-600 mb-8";
+                document.getElementById('final-bar').className = "bg-green-500 h-4 rounded-full transition-all duration-1000";
+            } else {
+                icon.innerHTML = '<i class="fas fa-book-reader text-blue-500"></i>';
+                msg.innerText = "Good effort. Review the Study Guide and try again!";
+                msg.className = "text-xl font-bold text-blue-600 mb-8";
+                document.getElementById('final-bar').className = "bg-blue-500 h-4 rounded-full transition-all duration-1000";
+            }
+        }
+
+        function resetQuiz() {
+            startQuiz();
+        }
+
+        // Start
+        updateCard();
+
+    </script>
+</body>
+
+</html>Beginner's Corner: AI Simplif
